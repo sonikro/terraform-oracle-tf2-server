@@ -1,6 +1,10 @@
 # Local .terraform directories
 .terraform/
 
+# Terraform lock files (generated on init, should be included for production but 
+# excluded here to avoid module-specific lock files)
+.terraform.lock.hcl
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
