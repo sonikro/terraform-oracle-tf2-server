@@ -21,7 +21,7 @@ resource "oci_kms_key" "docker_registry_key" {
 
   key_shape {
     algorithm = "AES"
-    length    = 32
+    length    = 32 # 256-bit AES encryption (32 bytes)
   }
 
   freeform_tags = var.freeform_tags
