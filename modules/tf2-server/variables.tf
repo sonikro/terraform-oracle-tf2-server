@@ -57,7 +57,7 @@ variable "container_memory_in_gbs" {
 variable "tf2_image" {
   description = "Docker image for the TF2 server"
   type        = string
-  default     = "cm2network/tf2"
+  default     = "ghcr.io/melkortf/tf2-base"
 }
 
 variable "tf2_image_tag" {
@@ -119,12 +119,6 @@ variable "maxplayers" {
     condition     = var.maxplayers >= 2 && var.maxplayers <= 32
     error_message = "maxplayers must be between 2 and 32"
   }
-}
-
-variable "enable_sourcemod" {
-  description = "Whether to enable SourceMod (requires MetaMod)"
-  type        = bool
-  default     = false
 }
 
 variable "additional_env_vars" {

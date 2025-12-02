@@ -14,15 +14,9 @@ locals {
     SRCDS_MAXPLAYERS   = tostring(var.maxplayers)
   }
 
-  # Additional SourceMod env vars if enabled
-  sourcemod_env_vars = var.enable_sourcemod ? {
-    INSTALL_SOURCEMOD = "1"
-  } : {}
-
   # Merge all environment variables
   all_env_vars = merge(
     local.base_env_vars,
-    local.sourcemod_env_vars,
     var.additional_env_vars
   )
 }
