@@ -10,10 +10,18 @@ on:
 
 jobs:
   validate_terraform:
-    name: Validate Terraform
+    name: Validate Terraform (${{ matrix.module }})
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      matrix:
+        module:
+          - modules/iam
+          - modules/network
+          - modules/tf2-server
+          - modules/vault
+          - examples/simple
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -21,41 +29,9 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Validate modules/iam
+      - name: Validate ${{ matrix.module }}
         shell: sh
-        working-directory: modules/iam
-        run: |
-          terraform init -backend=false
-          terraform fmt -check
-          terraform validate
-
-      - name: Validate modules/network
-        shell: sh
-        working-directory: modules/network
-        run: |
-          terraform init -backend=false
-          terraform fmt -check
-          terraform validate
-
-      - name: Validate modules/tf2-server
-        shell: sh
-        working-directory: modules/tf2-server
-        run: |
-          terraform init -backend=false
-          terraform fmt -check
-          terraform validate
-
-      - name: Validate modules/vault
-        shell: sh
-        working-directory: modules/vault
-        run: |
-          terraform init -backend=false
-          terraform fmt -check
-          terraform validate
-
-      - name: Validate examples/simple
-        shell: sh
-        working-directory: examples/simple
+        working-directory: ${{ matrix.module }}
         run: |
           terraform init -backend=false
           terraform fmt -check
