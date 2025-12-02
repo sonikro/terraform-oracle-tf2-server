@@ -40,4 +40,8 @@ override.tf.json
 .terraformrc
 terraform.rc
 
+# Node.js / npm (used only for semantic-release in CI/CD)
+node_modules/
+package-lock.json
+
 keys/
