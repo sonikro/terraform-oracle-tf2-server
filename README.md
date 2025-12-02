@@ -8,7 +8,7 @@ A Terraform Module for deploying long-lived Team Fortress 2 servers on Oracle Cl
 - **Multiple servers**: Deploy multiple TF2 servers sharing the same network infrastructure
 - **Modular design**: Separate modules for network, IAM, vault, and server deployment
 - **Flexible configuration**: Customize server settings, container resources, and game configurations
-- **Free tier compatible**: Works with Oracle Cloud's Always Free tier resources
+
 
 ## Module Structure
 
@@ -99,11 +99,13 @@ module "iam" {
 # Define server configurations
 locals {
   servers = {
-    mge = {
-      server_hostname = "MGE Server"
+    base = {
+      server_hostname = "Standard Server"
+      image           = "ghcr.io/melkortf/tf2-base"
     }
     competitive = {
       server_hostname = "Competitive Server"
+      image           = "ghcr.io/melkortf/tf2-competitive"
     }
   }
 }
@@ -114,10 +116,11 @@ module "tf2_servers" {
   for_each = local.servers
 
   compartment_id      = var.compartment_id
-  server_name         = "tf2-${each.key}"
+  server_name         = "tf2-${each.key}-server"
   availability_domain = module.network.availability_domain
   subnet_id           = module.network.subnet_id
   nsg_ids             = [module.network.nsg_id]
+  tf2_image           = each.value.image
 
   server_token    = var.server_token
   server_hostname = each.value.server_hostname
