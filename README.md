@@ -102,36 +102,34 @@ module "iam" {
   compartment_id = var.compartment_id
 }
 
-# Server 1: Payload
-module "tf2_payload" {
-  source = "github.com/sonikro/terraform-oracle-tf2-server//modules/tf2-server"
-
-  compartment_id      = var.compartment_id
-  server_name         = "tf2-payload"
-  availability_domain = module.network.availability_domain
-  subnet_id           = module.network.subnet_id
-  nsg_ids             = [module.network.nsg_id]
-
-  srcds_token     = var.srcds_token
-  server_hostname = "Payload Server"
-  map             = "pl_upward"
-
-  depends_on = [module.iam]
+# Define server configurations
+locals {
+  servers = {
+    mge = {
+      server_hostname = "MGE Server"
+      map             = "mge_training_v8_beta4b"
+    }
+    competitive = {
+      server_hostname = "Competitive Server"
+      map             = "cp_process_f12"
+    }
+  }
 }
 
-# Server 2: KOTH
-module "tf2_koth" {
-  source = "github.com/sonikro/terraform-oracle-tf2-server//modules/tf2-server"
+# Deploy multiple servers using for_each
+module "tf2_servers" {
+  source   = "github.com/sonikro/terraform-oracle-tf2-server//modules/tf2-server"
+  for_each = local.servers
 
   compartment_id      = var.compartment_id
-  server_name         = "tf2-koth"
+  server_name         = "tf2-${each.key}"
   availability_domain = module.network.availability_domain
   subnet_id           = module.network.subnet_id
   nsg_ids             = [module.network.nsg_id]
 
   srcds_token     = var.srcds_token
-  server_hostname = "KOTH Server"
-  map             = "koth_viaduct"
+  server_hostname = each.value.server_hostname
+  map             = each.value.map
 
   depends_on = [module.iam]
 }
@@ -165,20 +163,23 @@ Deploys a single TF2 server container instance.
 | `container_shape` | Container instance shape | `"CI.Standard.E4.Flex"` |
 | `container_ocpus` | Number of OCPUs | `1` |
 | `container_memory_in_gbs` | Memory in GB | `4` |
-| `tf2_image` | Docker image | `"cm2network/tf2"` |
-| `tf2_image_tag` | Docker image tag | `"latest"` |
-| `srcds_token` | Steam GSLT token | `""` |
+| `tf2_image` | Docker image | `"ghcr.io/melkortf/tf2-base"` |
+| `tf2_image_tag` | Docker image tag (optional) | `"latest"` |
+| `srcds_token` | Steam GSLT token (optional) | `""` |
 | `server_hostname` | Server display name | `"Team Fortress 2 Server"` |
-| `server_password` | Server password | `""` |
-| `rcon_password` | RCON password | `""` |
+| `server_password` | Server password (optional) | `""` |
+| `rcon_password` | RCON password (optional) | `""` |
 | `map` | Starting map | `"cp_badlands"` |
 | `maxplayers` | Max players (2-32) | `24` |
-| `enable_sourcemod` | Enable SourceMod | `false` |
 | `additional_env_vars` | Additional env vars | `{}` |
 
 ### IAM Module
 
 Creates IAM policies for container instances. Should only be created once per compartment.
+
+The IAM module creates a dynamic group and policies that allow container instances to:
+- Manage network security groups (required for container networking)
+- Read vault secret bundles (required if using private Docker registries with the vault module)
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -202,7 +203,7 @@ The network module configures the following ports for TF2:
 
 | Port Range | Protocol | Description |
 |------------|----------|-------------|
-| 27015-27020 | TCP | Game server and RCON |
+| 27015-27020 | TCP | Game server and SourceTV |
 | 27015-27020 | UDP | Game server and SourceTV |
 
 ## License
@@ -212,5 +213,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 ## References
 
 - [TF2-QuickServer](https://github.com/sonikro/TF2-QuickServer) - Reference implementation for on-demand TF2 servers
-- [cm2network/tf2](https://hub.docker.com/r/cm2network/tf2) - Docker image for TF2 servers
+- [melkortf/tf2-servers](https://github.com/melkortf/tf2-servers) - Docker images for TF2 servers
 - [Oracle Container Instances](https://docs.oracle.com/en-us/iaas/Content/container-instances/home.htm) - OCI Container Instances documentation

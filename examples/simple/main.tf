@@ -2,7 +2,8 @@
 # EXAMPLE: MULTIPLE TF2 SERVERS
 # ===========================================
 # This example demonstrates how to deploy multiple
-# TF2 servers sharing the same network infrastructure.
+# TF2 servers sharing the same network infrastructure
+# using the for_each approach.
 
 terraform {
   required_version = ">= 1.0"
@@ -70,44 +71,34 @@ module "iam" {
 # }
 
 # ===========================================
-# TF2 SERVER 1: PAYLOAD SERVER
+# SERVER CONFIGURATIONS
 # ===========================================
 
-module "tf2_payload_server" {
-  source = "../../modules/tf2-server"
-
-  compartment_id      = var.compartment_id
-  server_name         = "tf2-payload-server"
-  availability_domain = module.network.availability_domain
-  subnet_id           = module.network.subnet_id
-  nsg_ids             = [module.network.nsg_id]
-
-  # Container configuration
-  container_shape         = "CI.Standard.E4.Flex"
-  container_ocpus         = 1
-  container_memory_in_gbs = 4
-
-  # TF2 server configuration
-  srcds_token     = var.srcds_token
-  server_hostname = "My Payload Server"
-  map             = "pl_upward"
-  maxplayers      = 24
-  rcon_password   = var.rcon_password
-
-  freeform_tags = var.freeform_tags
-
-  depends_on = [module.iam]
+locals {
+  servers = {
+    mge = {
+      server_hostname = "MGE Training Server"
+      map             = "mge_training_v8_beta4b"
+      maxplayers      = 8
+    }
+    competitive = {
+      server_hostname = "Competitive Server"
+      map             = "cp_process_f12"
+      maxplayers      = 12
+    }
+  }
 }
 
 # ===========================================
-# TF2 SERVER 2: CONTROL POINTS SERVER
+# TF2 SERVERS (using for_each)
 # ===========================================
 
-module "tf2_cp_server" {
-  source = "../../modules/tf2-server"
+module "tf2_servers" {
+  source   = "../../modules/tf2-server"
+  for_each = local.servers
 
   compartment_id      = var.compartment_id
-  server_name         = "tf2-cp-server"
+  server_name         = "tf2-${each.key}-server"
   availability_domain = module.network.availability_domain
   subnet_id           = module.network.subnet_id
   nsg_ids             = [module.network.nsg_id]
@@ -119,39 +110,9 @@ module "tf2_cp_server" {
 
   # TF2 server configuration
   srcds_token     = var.srcds_token
-  server_hostname = "My Control Points Server"
-  map             = "cp_dustbowl"
-  maxplayers      = 24
-  rcon_password   = var.rcon_password
-
-  freeform_tags = var.freeform_tags
-
-  depends_on = [module.iam]
-}
-
-# ===========================================
-# TF2 SERVER 3: KING OF THE HILL SERVER
-# ===========================================
-
-module "tf2_koth_server" {
-  source = "../../modules/tf2-server"
-
-  compartment_id      = var.compartment_id
-  server_name         = "tf2-koth-server"
-  availability_domain = module.network.availability_domain
-  subnet_id           = module.network.subnet_id
-  nsg_ids             = [module.network.nsg_id]
-
-  # Container configuration
-  container_shape         = "CI.Standard.E4.Flex"
-  container_ocpus         = 1
-  container_memory_in_gbs = 4
-
-  # TF2 server configuration
-  srcds_token     = var.srcds_token
-  server_hostname = "My KOTH Server"
-  map             = "koth_viaduct"
-  maxplayers      = 24
+  server_hostname = each.value.server_hostname
+  map             = each.value.map
+  maxplayers      = each.value.maxplayers
   rcon_password   = var.rcon_password
 
   freeform_tags = var.freeform_tags
