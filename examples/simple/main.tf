@@ -22,11 +22,8 @@ terraform {
 
 provider "oci" {
   # Configure your OCI provider settings
-  # region = "us-ashburn-1"
-  # tenancy_ocid = var.tenancy_ocid
-  # user_ocid = var.user_ocid
-  # fingerprint = var.fingerprint
-  # private_key_path = var.private_key_path
+  # region              = "us-chicago-1"
+  # config_file_profile = "us-chicago-1"
 }
 
 # ===========================================
@@ -76,11 +73,13 @@ module "iam" {
 
 locals {
   servers = {
-    mge = {
-      server_hostname = "MGE Training Server"
+    base = {
+      server_hostname = "Standard Server"
+      image           = "ghcr.io/melkortf/tf2-base"
     }
     competitive = {
       server_hostname = "Competitive Server"
+      image           = "ghcr.io/melkortf/tf2-competitive"
     }
   }
 }
@@ -98,6 +97,7 @@ module "tf2_servers" {
   availability_domain = module.network.availability_domain
   subnet_id           = module.network.subnet_id
   nsg_ids             = [module.network.nsg_id]
+  tf2_image           = each.value.image
 
   # Container configuration
   container_shape         = "CI.Standard.E4.Flex"
