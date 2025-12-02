@@ -83,12 +83,6 @@ resource "oci_container_instances_container_instance" "tf2_server" {
 # DATA SOURCE FOR PUBLIC IP
 # ===========================================
 
-data "oci_core_vnic_attachments" "tf2_vnic_attachments" {
-  compartment_id = var.compartment_id
-
-  instance_id = oci_container_instances_container_instance.tf2_server.id
-}
-
 data "oci_core_vnic" "tf2_vnic" {
-  vnic_id = data.oci_core_vnic_attachments.tf2_vnic_attachments.vnic_attachments[0].vnic_id
+  vnic_id = oci_container_instances_container_instance.tf2_server.vnics[0].vnic_id
 }
