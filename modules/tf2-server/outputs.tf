@@ -22,13 +22,3 @@ output "vnic_id" {
   description = "The OCID of the VNIC"
   value       = data.oci_core_vnic.tf2_vnic.id
 }
-
-output "server_address" {
-  description = "The full server address to connect to (IP:port)"
-  value       = "${data.oci_core_vnic.tf2_vnic.public_ip_address}:27015"
-}
-
-output "connect_command" {
-  description = "Steam console command to connect to the server"
-  value       = "connect ${data.oci_core_vnic.tf2_vnic.public_ip_address}:27015"
-}

@@ -30,7 +30,7 @@ A Terraform Module for deploying long-lived Team Fortress 2 servers on Oracle Cl
 1. An Oracle Cloud Infrastructure account
 2. Terraform >= 1.0
 3. OCI CLI configured with credentials
-4. A Steam Game Server Login Token (GSLT) from https://steamcommunity.com/dev/managegameservers
+4. A Steam Game Server Login Token (GSLT) from https://steamcommunity.com/dev/managegameservers (optional)
 
 ### Basic Usage
 
@@ -67,10 +67,8 @@ module "tf2_server" {
   nsg_ids             = [module.network.nsg_id]
 
   # TF2 server configuration
-  srcds_token     = var.srcds_token
+  server_token    = var.server_token
   server_hostname = "My TF2 Server"
-  map             = "cp_badlands"
-  maxplayers      = 24
   rcon_password   = var.rcon_password
 
   depends_on = [module.iam]
@@ -78,10 +76,6 @@ module "tf2_server" {
 
 output "server_ip" {
   value = module.tf2_server.public_ip
-}
-
-output "connect_command" {
-  value = module.tf2_server.connect_command
 }
 ```
 
@@ -107,11 +101,9 @@ locals {
   servers = {
     mge = {
       server_hostname = "MGE Server"
-      map             = "mge_training_v8_beta4b"
     }
     competitive = {
       server_hostname = "Competitive Server"
-      map             = "cp_process_f12"
     }
   }
 }
@@ -127,9 +119,8 @@ module "tf2_servers" {
   subnet_id           = module.network.subnet_id
   nsg_ids             = [module.network.nsg_id]
 
-  srcds_token     = var.srcds_token
+  server_token    = var.server_token
   server_hostname = each.value.server_hostname
-  map             = each.value.map
 
   depends_on = [module.iam]
 }
@@ -151,7 +142,7 @@ Creates shared network infrastructure for TF2 servers.
 
 ### TF2 Server Module
 
-Deploys a single TF2 server container instance.
+Deploys a single TF2 server container instance. Environment variables are configured for the [melkortf/tf2-base](https://github.com/melkortf/tf2-servers) Docker image.
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -164,21 +155,32 @@ Deploys a single TF2 server container instance.
 | `container_ocpus` | Number of OCPUs | `1` |
 | `container_memory_in_gbs` | Memory in GB | `4` |
 | `tf2_image` | Docker image | `"ghcr.io/melkortf/tf2-base"` |
-| `tf2_image_tag` | Docker image tag (optional) | `"latest"` |
-| `srcds_token` | Steam GSLT token (optional) | `""` |
-| `server_hostname` | Server display name | `"Team Fortress 2 Server"` |
-| `server_password` | Server password (optional) | `""` |
-| `rcon_password` | RCON password (optional) | `""` |
-| `map` | Starting map | `"cp_badlands"` |
-| `maxplayers` | Max players (2-32) | `24` |
+| `tf2_image_tag` | Docker image tag | `"latest"` |
+| `server_token` | Steam GSLT token | `""` |
+| `server_hostname` | Server display name | `"A Team Fortress 2 server"` |
+| `server_password` | Server password | `""` |
+| `rcon_password` | RCON password | `"123456"` |
+| `port` | Game server port | `27015` |
+| `client_port` | Client port | `27016` |
+| `steam_port` | Master server updater port | `27018` |
+| `stv_port` | SourceTV port | `27020` |
+| `stv_name` | SourceTV host name | `"Source TV"` |
+| `stv_title` | SourceTV spectator UI title | `"A Team Fortress 2 server Source TV"` |
+| `stv_password` | SourceTV password | `""` |
+| `download_url` | FastDL URL | `"https://fastdl.serveme.tf/"` |
+| `enable_fake_ip` | Enable SDR (-enablefakeip) | `0` |
+| `ip` | Bind address | `"0.0.0.0"` |
+| `demos_tf_apikey` | demos.tf API key | `""` |
+| `logs_tf_apikey` | logs.tf API key | `""` |
 | `additional_env_vars` | Additional env vars | `{}` |
+| `image_pull_secrets` | Vault secret OCID for registry credentials | `""` |
+| `registry_endpoint` | Docker registry endpoint | `"https://ghcr.io"` |
 
 ### IAM Module
 
 Creates IAM policies for container instances. Should only be created once per compartment.
 
 The IAM module creates a dynamic group and policies that allow container instances to:
-- Manage network security groups (required for container networking)
 - Read vault secret bundles (required if using private Docker registries with the vault module)
 
 | Variable | Description | Default |

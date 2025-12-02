@@ -7,16 +7,18 @@ variable "compartment_id" {
   type        = string
 }
 
-variable "srcds_token" {
+variable "server_token" {
   description = "Steam Game Server Login Token (GSLT) - get one at https://steamcommunity.com/dev/managegameservers"
   type        = string
   sensitive   = true
+  default     = ""
 }
 
 variable "rcon_password" {
   description = "RCON password for remote server administration"
   type        = string
   sensitive   = true
+  default     = "123456"
 }
 
 # ===========================================
