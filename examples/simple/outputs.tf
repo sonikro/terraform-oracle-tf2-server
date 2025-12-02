@@ -25,9 +25,8 @@ output "servers" {
   description = "Summary of all deployed TF2 servers"
   value = {
     for key, server in module.tf2_servers : key => {
-      name            = "tf2-${key}-server"
-      public_ip       = server.public_ip
-      connect_command = server.connect_command
+      name      = "tf2-${key}-server"
+      public_ip = server.public_ip
     }
   }
 }

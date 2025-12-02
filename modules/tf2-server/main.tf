@@ -3,15 +3,24 @@
 # ===========================================
 
 locals {
-  # Base environment variables for TF2 server
+  # Base environment variables for TF2 server (matching melkortf/tf2-base image)
   base_env_vars = {
-    SRCDS_TOKEN        = var.srcds_token
-    SV_SETSTEAMACCOUNT = var.sv_setsteamaccount != "" ? var.sv_setsteamaccount : var.srcds_token
-    SRCDS_HOSTNAME     = var.server_hostname
-    SRCDS_PW           = var.server_password
-    SRCDS_RCONPW       = var.rcon_password
-    SRCDS_STARTMAP     = var.map
-    SRCDS_MAXPLAYERS   = tostring(var.maxplayers)
+    IP              = var.ip
+    PORT            = tostring(var.port)
+    CLIENT_PORT     = tostring(var.client_port)
+    STEAM_PORT      = tostring(var.steam_port)
+    STV_PORT        = tostring(var.stv_port)
+    SERVER_TOKEN    = var.server_token
+    RCON_PASSWORD   = var.rcon_password
+    SERVER_HOSTNAME = var.server_hostname
+    SERVER_PASSWORD = var.server_password
+    STV_NAME        = var.stv_name
+    STV_TITLE       = var.stv_title
+    STV_PASSWORD    = var.stv_password
+    DOWNLOAD_URL    = var.download_url
+    ENABLE_FAKE_IP  = tostring(var.enable_fake_ip)
+    DEMOS_TF_APIKEY = var.demos_tf_apikey
+    LOGS_TF_APIKEY  = var.logs_tf_apikey
   }
 
   # Merge all environment variables
@@ -54,7 +63,7 @@ resource "oci_container_instances_container_instance" "tf2_server" {
   dynamic "image_pull_secrets" {
     for_each = var.image_pull_secrets != "" ? [1] : []
     content {
-      registry_endpoint = "https://index.docker.io/v1/"
+      registry_endpoint = var.registry_endpoint
       secret_type       = "VAULT"
       secret_id         = var.image_pull_secrets
     }

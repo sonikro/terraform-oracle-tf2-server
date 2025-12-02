@@ -70,15 +70,8 @@ variable "tf2_image_tag" {
 # TF2 SERVER CONFIGURATION
 # ===========================================
 
-variable "srcds_token" {
+variable "server_token" {
   description = "Steam Game Server Login Token (GSLT) - required for server to be listed on master servers"
-  type        = string
-  sensitive   = true
-  default     = ""
-}
-
-variable "sv_setsteamaccount" {
-  description = "Steam Game Server Account Token (typically same as SRCDS_TOKEN)"
   type        = string
   sensitive   = true
   default     = ""
@@ -87,7 +80,7 @@ variable "sv_setsteamaccount" {
 variable "server_hostname" {
   description = "Hostname displayed in the server browser"
   type        = string
-  default     = "Team Fortress 2 Server"
+  default     = "A Team Fortress 2 server"
 }
 
 variable "server_password" {
@@ -101,24 +94,87 @@ variable "rcon_password" {
   description = "RCON password for remote administration"
   type        = string
   sensitive   = true
+  default     = "123456"
+}
+
+variable "port" {
+  description = "The port which the server will run on"
+  type        = number
+  default     = 27015
+}
+
+variable "client_port" {
+  description = "The client port"
+  type        = number
+  default     = 27016
+}
+
+variable "steam_port" {
+  description = "Master server updater port"
+  type        = number
+  default     = 27018
+}
+
+variable "stv_port" {
+  description = "SourceTV port"
+  type        = number
+  default     = 27020
+}
+
+variable "stv_name" {
+  description = "SourceTV host name"
+  type        = string
+  default     = "Source TV"
+}
+
+variable "stv_title" {
+  description = "Title for the SourceTV spectator UI"
+  type        = string
+  default     = "A Team Fortress 2 server Source TV"
+}
+
+variable "stv_password" {
+  description = "SourceTV password"
+  type        = string
+  sensitive   = true
   default     = ""
 }
 
-variable "map" {
-  description = "Starting map for the server"
+variable "download_url" {
+  description = "Download URL for the FastDL"
   type        = string
-  default     = "cp_badlands"
+  default     = "https://fastdl.serveme.tf/"
 }
 
-variable "maxplayers" {
-  description = "Maximum number of players"
+variable "enable_fake_ip" {
+  description = "Enables/Disables SDR by turning the -enablefakeip flag on or off"
   type        = number
-  default     = 24
+  default     = 0
 
   validation {
-    condition     = var.maxplayers >= 2 && var.maxplayers <= 32
-    error_message = "maxplayers must be between 2 and 32"
+    condition     = var.enable_fake_ip == 0 || var.enable_fake_ip == 1
+    error_message = "enable_fake_ip must be 0 or 1"
   }
+}
+
+variable "ip" {
+  description = "Specifies the address to use for the bind(2) syscall"
+  type        = string
+  default     = "0.0.0.0"
+}
+
+variable "demos_tf_apikey" {
+  description = "The API key used to upload the demo to demos.tf"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "logs_tf_apikey" {
+  description = "The API key used to upload logs to logs.tf"
+  type        = string
+  sensitive   = true
+  default     = ""
 }
 
 variable "additional_env_vars" {
@@ -135,6 +191,12 @@ variable "image_pull_secrets" {
   description = "OCID of the vault secret containing Docker registry credentials (for private images)"
   type        = string
   default     = ""
+}
+
+variable "registry_endpoint" {
+  description = "Docker registry endpoint URL (e.g., https://index.docker.io/v1/ for Docker Hub, https://ghcr.io for GitHub Container Registry)"
+  type        = string
+  default     = "https://ghcr.io"
 }
 
 # ===========================================

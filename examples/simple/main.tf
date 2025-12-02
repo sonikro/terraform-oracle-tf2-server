@@ -78,13 +78,9 @@ locals {
   servers = {
     mge = {
       server_hostname = "MGE Training Server"
-      map             = "mge_training_v8_beta4b"
-      maxplayers      = 8
     }
     competitive = {
       server_hostname = "Competitive Server"
-      map             = "cp_process_f12"
-      maxplayers      = 12
     }
   }
 }
@@ -109,10 +105,8 @@ module "tf2_servers" {
   container_memory_in_gbs = 4
 
   # TF2 server configuration
-  srcds_token     = var.srcds_token
+  server_token    = var.server_token
   server_hostname = each.value.server_hostname
-  map             = each.value.map
-  maxplayers      = each.value.maxplayers
   rcon_password   = var.rcon_password
 
   freeform_tags = var.freeform_tags
