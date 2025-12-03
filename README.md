@@ -46,7 +46,7 @@ provider "oci" {
 
 # Create shared network infrastructure
 module "network" {
-  source = "github.com/sonikro/terraform-oracle-tf2-server//modules/network"
+  source = "git::https://github.com/sonikro/terraform-oracle-tf2-server.git?ref=modules/network/v1.0.0"
 
   compartment_id = var.compartment_id
   name_prefix    = "tf2-servers"
@@ -54,7 +54,7 @@ module "network" {
 
 # Create IAM policies (once per compartment)
 module "iam" {
-  source = "github.com/sonikro/terraform-oracle-tf2-server//modules/iam"
+  source = "git::https://github.com/sonikro/terraform-oracle-tf2-server.git?ref=modules/iam/v1.0.0"
 
   compartment_id = var.compartment_id
   name_prefix    = "tf2-servers"
@@ -62,7 +62,7 @@ module "iam" {
 
 # Deploy a TF2 server
 module "tf2_server" {
-  source = "github.com/sonikro/terraform-oracle-tf2-server//modules/tf2-server"
+  source = "git::https://github.com/sonikro/terraform-oracle-tf2-server.git?ref=modules/tf2-server/v1.0.0"
 
   compartment_id      = var.compartment_id
   server_name         = "my-tf2-server"
@@ -88,14 +88,14 @@ output "server_ip" {
 ```hcl
 # Shared infrastructure (created once)
 module "network" {
-  source = "github.com/sonikro/terraform-oracle-tf2-server//modules/network"
+  source = "git::https://github.com/sonikro/terraform-oracle-tf2-server.git?ref=modules/network/v1.0.0"
 
   compartment_id = var.compartment_id
   name_prefix    = "tf2-servers"
 }
 
 module "iam" {
-  source = "github.com/sonikro/terraform-oracle-tf2-server//modules/iam"
+  source = "git::https://github.com/sonikro/terraform-oracle-tf2-server.git?ref=modules/iam/v1.0.0"
 
   compartment_id = var.compartment_id
 }
@@ -116,7 +116,7 @@ locals {
 
 # Deploy multiple servers using for_each
 module "tf2_servers" {
-  source   = "github.com/sonikro/terraform-oracle-tf2-server//modules/tf2-server"
+  source   = "git::https://github.com/sonikro/terraform-oracle-tf2-server.git?ref=modules/tf2-server/v1.0.0"
   for_each = local.servers
 
   compartment_id      = var.compartment_id
