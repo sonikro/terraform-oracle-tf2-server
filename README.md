@@ -27,6 +27,12 @@ A Terraform Module for deploying long-lived Team Fortress 2 servers on Oracle Cl
     └── simple/           # Example deploying multiple servers
 ```
 
+## ⚠️ Cost Warning
+
+**Important:** Deploying these Terraform modules will incur costs on your Oracle Cloud Infrastructure account. TF2 servers do not run on ARM64 processors, so they cannot use the Oracle Cloud free tier. With default settings (1 OCPU and 4GB memory), expect approximately **$23.08 USD per month** in operational costs per server. See [Oracle Cloud Cost Estimator](https://www.oracle.com/cloud/costestimator.html) for details.
+
+**You are responsible for all charges.** If you are only experimenting, ensure you destroy the resources when finished to avoid unexpected bills.
+
 ## Quick Start
 
 ### Prerequisites
