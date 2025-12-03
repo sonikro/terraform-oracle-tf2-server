@@ -94,7 +94,6 @@ variable "rcon_password" {
   description = "RCON password for remote administration"
   type        = string
   sensitive   = true
-  default     = "123456"
 }
 
 variable "port" {
