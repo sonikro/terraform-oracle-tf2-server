@@ -1,5 +1,9 @@
 # terraform-oracle-tf2-server
 
+[![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.0-blue)](https://www.terraform.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Wiki](https://img.shields.io/badge/Documentation-Wiki-informational)](https://github.com/sonikro/terraform-oracle-tf2-server/wiki)
+
 A Terraform Module for deploying long-lived Team Fortress 2 servers on Oracle Cloud Infrastructure (OCI) using Oracle Container Instances.
 
 ## Features
